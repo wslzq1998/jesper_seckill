@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzq.jesper_seckill.dao.OrderMapper">
+    <resultMap id="orderDetailVo" type="com.lzq.jesper_seckill.vo.OrderDetailVo">
+        <association property="goods" column="goods_id" select="selectGoodsByGoodsId"></association>
+        <association property="order" column="order_id" select="getOrderById"></association>
+    </resultMap>
+    <select id="selectGoodsByGoodsId" parameterType="java.lang.Long" resultType="com.lzq.jesper_seckill.vo.GoodsVo">
+        select a.*,b.*
+        from sk_goods a,sk_goods_seckill b
+        where a.id = b.goods_id and a.id = #{goodsId}
+    </select>
+    <select id="getOrderByUserIdGoodsId" parameterType="java.lang.Long" resultType="com.lzq.jesper_seckill.model.Order">
+        select * from sk_order where user_id = #{userId} and goods_id = #{goodsId}
+    </select>
+    <insert id="insert" parameterType="com.lzq.jesper_seckill.model.OrderInfo" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        insert into sk_order_info(user_id, goods_id, goods_name, goods_count, goods_price, order_channel, status, create_date)
+        values(#{userId}, #{goodsId}, #{goodsName}, #{goodsCount}, #{goodsPrice}, #{orderChannel},#{status},#{createDate} )
+    </insert>
+    <insert id="insertSeckillOrder" parameterType="com.lzq.jesper_seckill.model.Order">
+        insert into sk_order (user_id, goods_id, order_id)values(#{userId}, #{goodsId}, #{orderId})
+    </insert>
+    <select id="getOrderById" parameterType="java.lang.Long" resultType="com.lzq.jesper_seckill.model.OrderInfo">
+        select * from sk_order_info where id = #{orderId}
+    </select>
+    <select id="getOrdersList" parameterType="java.lang.Long" resultMap="orderDetailVo">
+        select *
+        from sk_order
+        where user_id = #{userId}
+    </select>
+    <delete id="deleteOrderById" parameterType="java.lang.Long">
+        delete from sk_order where order_id = #{orderId} and user_id = #{userId}
+    </delete>
+    <delete id="deleteOrderInfoById" parameterType="java.lang.Long">
+        delete from sk_order_info where id = #{orderId} and user_id = #{userId}
+    </delete>
+</mapper>

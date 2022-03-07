@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>商品列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/static/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/static/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/static/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/static/layer/layer.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/static/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/static/js/common.js}"></script>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background: url('/static/img/bg2.jpg') no-repeat;
+            background-size: 100% 100%;
+        }
+
+        #goodslist td {
+            border-top: 1px solid #39503f61;
+        }
+    </style>
+</head>
+<body>
+
+<div class="panel panel-default" style="height:100%;background-color:rgba(222,222,222,0.8)">
+    <div class="panel-heading">
+        当前用户：<a th:text="${user.nickname}"></a>
+        <div style="float: right;width: 150px;height: 10px;">
+            <button class="btn btn-primary" style="padding: 5px 5px;" onclick="javascrtpt:window.location.href='/order/ordersList'">我的订单</button>
+            <a>&nbsp;</a>
+            <button class="btn btn-primary" style="padding: 5px 5px;" onclick="javascrtpt:window.location.href='/login/to_logout'">退出登录</button>
+        </div>
+    </div>
+    <div class="panel-heading">秒杀商品列表</div>
+    <table class="table" id="goodslist">
+        <tr>
+            <td>商品名称</td>
+            <td>商品图片</td>
+            <td>商品原价</td>
+            <td>秒杀价</td>
+            <td>库存数量</td>
+            <td>详情</td>
+        </tr>
+        <tr th:each="goods,goodsStat : ${goodsList}">
+            <td th:text="${goods.goodsName}"></td>
+            <td><img th:src="@{${goods.goodsImg}}" width="100" height="100"/></td>
+            <td th:text="${goods.goodsPrice}"></td>
+            <td th:text="${goods.seckillPrice}"></td>
+            <td th:text="${goods.stockCount}"></td>
+            <td><a th:href="@{'/goods/detail/'+${goods.id}}">详情</a></td>
+        </tr>
+    </table>
+    <div style="height:10%;width:30%;margin: 0 auto">
+        <ul class="pagination" id="page"></ul>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var pageNum = [[${pageNum}]];
+    var maxPageNum = [[${maxPageNum}]];
+    var prePage = [[${prePage}]];
+    var nextPage = [[${nextPage}]];
+    $(function() {
+        var count = 0;
+        var startPage = 1;
+        if(pageNum-3>=0) startPage = pageNum-2;
+        if(maxPageNum<=5) startPage = 1;
+        $("#page").append("<li><a href=\"/goods/to_list?pageNum=1\">首页</a></li>");
+        $("#page").append("<li><a href=\"/goods/to_list?pageNum="+prePage+"\">&laquo;</a></li>");
+        while(count<5&&(startPage+count)<=maxPageNum){
+            if(startPage+count==pageNum){
+                $("#page").append("<li class=\"active\"><a href=\"/goods/to_list?pageNum="+(startPage+count)+"\">"+(startPage+count)+"</a></li>");
+            }else {
+                $("#page").append("<li><a href=\"/goods/to_list?pageNum=" + (startPage + count) + "\">" + (startPage + count) + "</a></li>");
+            }
+            count++;
+        }
+        $("#page").append("<li><a href=\"/goods/to_list?pageNum="+nextPage+"\">&raquo;</a></li>");
+        $("#page").append("<li><a href=\"/goods/to_list?pageNum="+maxPageNum+"\">尾页</a></li>");
+    })
+</script>
+</html>

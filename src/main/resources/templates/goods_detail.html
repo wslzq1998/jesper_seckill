@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>商品详情</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/static/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/static/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/static/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/static/layer/layer.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/static/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/static/js/common.js}"></script>
+</head>
+<body>
+
+<div class="panel panel-default">
+    <div class="panel-heading">秒杀商品详情</div>
+    <div class="panel-body">
+        <span th:if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>
+    </div>
+    <table class="table" id="goodslist">
+        <tr>
+            <td>商品名称</td>
+            <td colspan="3" th:text="${goods.goodsName}"></td>
+        </tr>
+        <tr>
+            <td>商品图片</td>
+            <td colspan="3"><img th:src="@{${goods.goodsImg}}" width="200" height="200"/></td>
+        </tr>
+        <tr>
+            <td>秒杀开始时间</td>
+            <td th:text="${#dates.format(goods.startDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        </tr>
+        <tr>
+            <td id="seckillTip">
+                <input type="hidden" id="remainSeconds" th:value="${goods.remainSeconds}"/>
+                <span th:if="${goods.seckillStatus eq 0}">秒杀倒计时：</span>
+                <span th:if="${goods.seckillStatus eq 1}">秒杀进行中</span>
+                <span th:if="${goods.seckillStatus eq 2}">秒杀已结束</span>
+            </td>
+            <td>
+                <span th:if="${goods.seckillStatus eq 0}"><span id="countDown"
+                                                          th:text="${goods.remainSeconds}"></span>秒</span>
+            </td>
+            <td>
+<!--                <form id="seckillForm" method="post" action="/goods/do_seckill">-->
+                <form id="seckillForm">
+                    <button class="btn btn-primary btn-block" type="submit" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                    <input type="hidden" id="goodsId" name="goodsId" th:value="${goods.id}"/>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>商品原价</td>
+            <td colspan="3" th:text="${goods.goodsPrice}"></td>
+        </tr>
+        <tr>
+            <td>秒杀价</td>
+            <td colspan="3" th:text="${goods.seckillPrice}"></td>
+        </tr>
+        <tr>
+            <td>库存数量</td>
+            <td colspan="3" th:text="${goods.stockCount}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+<script>
+    $(function () {
+        countDown();
+    });
+    function doSeckill() {
+        $.ajax({
+            url: "/goods/seckill",
+            type: "POST",
+            data: {
+                 goodsId: $("#goodsId").val()
+            },
+            success:function(data) {
+                if (data.code == 0) {
+                    window.location.href = "/order/ordersList";
+                } else {
+                    // window.location.href = "/error/" + data.msg;
+                    window.alert(data.msg);
+                }
+            },
+            error:function () {
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
+
+    function countDown() {
+        var remainSeconds = $("#remainSeconds").val();
+        var timeout;
+        if (remainSeconds > 0) {//秒杀还没开始，倒计时
+            timeout = setTimeout(function () {
+                $("#countDown").text(remainSeconds - 1);
+                $("#remainSeconds").val(remainSeconds - 1);
+                countDown();
+            }, 1000);
+        } else if (remainSeconds == 0) {//秒杀进行中
+            $("#buyButton").attr("disabled", false);
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            $("#seckillTip").html("秒杀进行中");
+        } else {//秒杀已经结束
+            $("#seckillTip").html("秒杀已经结束");
+        }
+    }
+    //禁止form表单提交，仅ajax提交数据
+    var form = document.forms[0];
+    form.addEventListener("submit",function(e){
+            e.preventDefault();
+    },false);
+</script>
+</html>

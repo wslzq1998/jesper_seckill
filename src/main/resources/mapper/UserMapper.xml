@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzq.jesper_seckill.dao.UserMapper">
+    <select id="getById" parameterType="java.lang.Long" resultType="com.lzq.jesper_seckill.model.User">
+        select id,nickname,password,salt,head,
+               register_date as registerDate,
+               last_login_date as lastLoginDate,
+               login_count as loginCount
+        from sk_user
+        where id = #{id}
+    </select>
+    <update id="update" parameterType="com.lzq.jesper_seckill.model.User">
+        update sk_user set password = #{password} where id = #{id}
+    </update>
+</mapper>

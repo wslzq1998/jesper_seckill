@@ -1,0 +1,75 @@
+#thymeleaf
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    servlet:
+      content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+  # druid
+  datasource:
+    url: jdbc:mysql://localhost:3306/miaosha?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    tomcat:
+      max-active: 1000
+      initial-size: 100
+      max-wait: 60000
+      min-idle: 500
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+  #redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 1000
+        max-idle: 500
+        max-wait: 500
+  #static
+  mvc:
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
+      chain:
+        cache: true
+        enabled: true
+      add-mappings: true
+      cache:
+        period: 3600
+  # rabbitmq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    password: guest
+    username: guest
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
+# mybatis
+mybatis:
+  type-aliases-package: com.jesper.seckill.mapper
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 10
+    default-statement-timeout: 3000
+  mapper-locations: classpath:mapper/*.xml
+server:
+  servlet:
+    session:
+      timeout: 600
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
