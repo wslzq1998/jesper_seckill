@@ -2,14 +2,16 @@ package com.lzq.jesper_seckill.service.serviceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Future;
 
 @Service
-public class AsyncService {
+@EnableAsync
+@EnableScheduling
+public class AsyncService implements InitializingBean {
     private Logger logger = LoggerFactory.getLogger(AsyncService.class);
 
     /**
@@ -29,5 +31,15 @@ public class AsyncService {
         logger.info("asyncResultTestTwo");
         String result="successTwo";
         return new AsyncResult<String>(result);
+    }
+    @Async("asyncServiceExecutor")
+    @Scheduled(cron = "0/5 * * * * ?")
+    public void batchLocalRun(){
+        System.out.println("定时任务线程："+Thread.currentThread().getName());
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.batchLocalRun();
     }
 }
